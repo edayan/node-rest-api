@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const path =require('path');
+
 const feedRoutes = require('./routes/feed');
 
 const app = express();
@@ -19,6 +21,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 mongoose
   .connect(
