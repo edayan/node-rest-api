@@ -22,9 +22,9 @@ exports.getPosts = (req, res, next) => {
 exports.createPost = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res
-      .status(422)
-      .json({ message: 'Validation failed', errors: errors.array() });
+    const error = new Error('Validation failed');
+    error.statusCode = 422;
+    throw error;
   }
 
   const title = req.body.title;
@@ -46,5 +46,10 @@ exports.createPost = (req, res, next) => {
         post: result
       });
     })
-    .catch(err => console.log('error in saving post to db', err));
+    .catch(err => {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(err);
+    });
 };
