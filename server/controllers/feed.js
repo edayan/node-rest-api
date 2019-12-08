@@ -1,4 +1,6 @@
 const { validationResult } = require('express-validator');
+const fs = require('fs');
+const path = require('path');
 
 const Post = require('../models/post');
 
@@ -71,6 +73,60 @@ exports.getPost = (req, res, next) => {
     .catch(err => {
       this.handelError(err, next);
     });
+};
+
+exports.updatePost = (req, res, next) => {
+  const postId = req.params.postId;
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed');
+    error.statusCode = 422;
+    throw error;
+  }
+
+  const title = req.body.title;
+  const content = req.body.content;
+  const imageUrl = req.body.image;
+  if (req.file) {
+    const imageUrl = req.file.path;
+  }
+  if (!imageUrl) {
+    const error = new Error('No file picked for post with id' + postId);
+    error.statusCode = 422;
+    throw error;
+  }
+
+  Post.findById(postId)
+    .then(post => {
+      if (!post) {
+        const error = new Error('Could not find post with id' + postId);
+        error.statusCode = 404;
+        throw error;
+      }
+
+      if (imageUrl !== post.imageUrl) {
+        this.clearImage(post.imageUrl);
+      }
+
+      post.title = title;
+      post.content = content;
+      post.imageUrl = imageUrl;
+      return post.save();
+    })
+    .then(result => {
+      res
+        .status(200)
+        .json({ message: 'Post updated successfully', post: result });
+    })
+    .catch(err => {
+      this.handelError(err, next);
+    });
+};
+
+const clearImage = filePath => {
+  filePath = path.join(__dirname, '..', filePath);
+  fs.unlink(filePath, err => console.log(err));
 };
 
 handelError = (err, next) => {
