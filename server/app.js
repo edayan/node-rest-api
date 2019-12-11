@@ -63,7 +63,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    ''
+    'mongodb+srv://brad123:brad123@devconnector-0zbgf.mongodb.net/messages?retryWrites=true&w=majority'
   )
   .then(resulr => {
     console.log('db connection successfull');

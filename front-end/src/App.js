@@ -62,7 +62,8 @@ class App extends Component {
     fetch('http://localhost:8080/auth/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.props.token
       },
       body: JSON.stringify({
         email: authData.email,
@@ -112,7 +113,8 @@ class App extends Component {
     fetch('http://localhost:8080/auth/signup', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.props.token
       },
       body: JSON.stringify({
         email: authData.signupForm.email.value,
