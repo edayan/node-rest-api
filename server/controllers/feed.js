@@ -25,7 +25,7 @@ exports.getPosts = async (req, res, next) => {
   }
 };
 
-exports.createPost = (req, res, next) => {
+exports.createPost = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed');
@@ -42,36 +42,29 @@ exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
   const imageUrl = req.file.path;
-  let creator;
   const post = new Post({
     title: title,
     content: content,
     imageUrl: imageUrl,
     creator: req.userId
   });
-  post
-    .save()
-    .then(result => {
-      return User.findById(req.userId);
-    })
-    .then(user => {
-      creator = user;
-      user.posts.push(post);
-      return user.save();
-    })
-    .then(result => {
-      return res.status(201).json({
-        message: 'Post created successfully!',
-        post: post,
-        creator: {
-          id: creator._id,
-          name: creator.name
-        }
-      });
-    })
-    .catch(err => {
-      handleError(err, next);
+
+  try {
+    const result = await post.save();
+    const user = await User.findById(req.userId);
+    user.posts.push(post);
+    const savedUSer = await user.save();
+    res.status(201).json({
+      message: 'Post created successfully!',
+      post: post,
+      creator: {
+        id: savedUSer._id,
+        name: savedUSer.name
+      }
     });
+  } catch (err) {
+    handleError(err, next);
+  }
 };
 
 exports.getPost = (req, res, next) => {
