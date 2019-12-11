@@ -23,7 +23,7 @@ exports.getPosts = (req, res, next) => {
       });
     })
     .catch(err => {
-      this.handelError(err, next);
+      handleError(err, next);
     });
 };
 
@@ -72,7 +72,7 @@ exports.createPost = (req, res, next) => {
       });
     })
     .catch(err => {
-      this.handelError(err, next);
+      handleError(err, next);
     });
 };
 
@@ -92,7 +92,7 @@ exports.getPost = (req, res, next) => {
       });
     })
     .catch(err => {
-      this.handelError(err, next);
+      handleError(err, next);
     });
 };
 
@@ -126,6 +126,14 @@ exports.updatePost = (req, res, next) => {
         throw error;
       }
 
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error(
+          'cannot delete ' + postId + ' as not authorized'
+        );
+        error.statusCode = 403;
+        throw error;
+      }
+
       if (imageUrl !== post.imageUrl) {
         this.clearImage(post.imageUrl);
       }
@@ -141,7 +149,7 @@ exports.updatePost = (req, res, next) => {
         .json({ message: 'Post updated successfully', post: result });
     })
     .catch(err => {
-      this.handelError(err, next);
+      handleError(err, next);
     });
 };
 
@@ -162,7 +170,7 @@ exports.deletePost = (req, res, next) => {
       res.status(200).json({ message: 'Deleted post with id:' + postId });
     })
     .catch(err => {
-      this.handelError(err, next);
+      handleError(err, next);
     });
 };
 
@@ -171,7 +179,7 @@ const clearImage = filePath => {
   fs.unlink(filePath, err => console.log(err));
 };
 
-handelError = (err, next) => {
+handleError = (err, next) => {
   if (!err.statusCode) {
     err.statusCode = 500;
   }
