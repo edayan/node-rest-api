@@ -71,6 +71,22 @@ exports.login = (req, res, next) => {
     });
 };
 
+exports.getUserStatus = (req, res, next) => {
+  User.findById(req.userId)
+    .then(user => {
+      if (!user) {
+        const error = new Error('user not found');
+        error.status = 401;
+        throw error;
+      }
+
+      return res.status(200).json({ status: user.status });
+    })
+    .catch(err => {
+      handleError(err, next);
+    });
+};
+
 handleError = (error, next) => {
   if (!error.statusCode) {
     error.statusCode = 500;
