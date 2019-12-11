@@ -87,6 +87,34 @@ exports.getUserStatus = (req, res, next) => {
     });
 };
 
+exports.updateUserStatus = (req, res, next) => {
+  const newStatus = req.body.status;
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed');
+    error.statusCode = 422;
+    error.data = errors.array();
+    throw error;
+  }
+
+  User.findById(req.userId)
+    .then(user => {
+      if (!user) {
+        const error = new Error('user not found');
+        error.status = 401;
+        throw error;
+      }
+      user.status = newStatus;
+      return user.save();
+    })
+    .then(user => {
+      return res.status(200).json({ status: user.status });
+    })
+    .catch(err => {
+      handleError(err, next);
+    });
+};
 handleError = (error, next) => {
   if (!error.statusCode) {
     error.statusCode = 500;
