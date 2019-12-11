@@ -34,6 +34,36 @@ exports.signup = (req, res, next) => {
     });
 };
 
+exports.login = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser;
+
+  User.findOne({ email: email })
+    .then(user => {
+      if (!user) {
+        const error = new Error('authentication failed');
+        error.status = 404;
+        throw error;
+      }
+
+      loadedUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then(isEqual => {
+      if (!isEqual) {
+        const error = new Error('authentication failed');
+        error.status = 401;
+        throw error;
+      }
+
+      
+    })
+    .catch(err => {
+      handelError(err, next);
+    });
+};
+
 handleError = (error, next) => {
   if (!error.statusCode) {
     error.statusCode = 500;
