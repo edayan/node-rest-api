@@ -11,7 +11,7 @@ exports.getPosts = async (req, res, next) => {
   try {
     const count = await Post.find().countDocuments();
     let totalItems = count;
-    const posts = await Post.find()
+    const posts = await Post.find().populate('creator')
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
 
@@ -123,7 +123,7 @@ exports.updatePost = async (req, res, next) => {
     }
 
     if (imageUrl !== post.imageUrl) {
-      this.clearImage(post.imageUrl);
+      clearImage(post.imageUrl);
     }
 
     post.title = title;
