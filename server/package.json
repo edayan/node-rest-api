@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --recursive",
     "start": "nodemon app.js"
   },
   "repository": {
@@ -26,6 +26,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^7.0.1",
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "sinon": "^9.0.0"
   }
 }
