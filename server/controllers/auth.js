@@ -39,7 +39,6 @@ exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   let loadedUser;
-
   User.findOne({ email: email })
     .then(user => {
       if (!user) {
@@ -65,10 +64,14 @@ exports.login = (req, res, next) => {
       );
 
       res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+      return;
     })
     .catch(err => {
       handleError(err, next);
+      return err;
     });
+
+
 };
 
 exports.getUserStatus = (req, res, next) => {
